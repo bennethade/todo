@@ -21,6 +21,7 @@ router.get('/register', (req, res) => {
 
 
 // Handle registration form submission
-router.post('/registeration', UserController.register);
+router.post('/registration', UserController.register);
+router.post('/login', UserController.login);
 
 module.exports = router;

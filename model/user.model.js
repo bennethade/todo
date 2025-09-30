@@ -19,6 +19,9 @@ const userSchema = new Schema({
     }
 });
 
+
+
+// Hashing password before saving to database
 userSchema.pre('save', async function (){
     try {
         var user = this;
@@ -26,11 +29,23 @@ userSchema.pre('save', async function (){
         const hashedPassword = await bcrypt.hash(user.password, salt);
 
         user.password = hashedPassword;
-        
+
     } catch (error) {
         throw error;
     }
-})
+});
+
+
+userSchema.methods.comparePassword = async function (userPassword){
+    try {
+        const isMatch = await bcrypt.compare(userPassword, this.password);
+        return isMatch;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 
 const UserModel = db.model('User', userSchema);
 
