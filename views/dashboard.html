@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            /* bg-dark-900 */
+        }
+
+        .sidebar {
+            background-color: #1e293b;
+            /* dark navy */
+        }
+
+        .card {
+            background-color: #1e293b;
+        }
+
+        input,
+        textarea {
+            background-color: #0f172a;
+            color: white;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body class="text-gray-200 flex h-screen">
+
+    <!-- ✅ Sidebar -->
+    <aside class="sidebar w-64 p-6 flex flex-col justify-between">
+        <div>
+            <h2 class="text-2xl font-bold mb-8">🧠 Todo Dashboard</h2>
+            <nav class="space-y-4">
+                <a href="#" class="block text-gray-300 hover:text-white">🏠 Home</a>
+                <a href="#" class="block text-gray-300 hover:text-white">📝 Todos</a>
+                <a href="#" class="block text-gray-300 hover:text-white">⚙️ Settings</a>
+            </nav>
+        </div>
+        <button id="logoutBtn" class="mt-8 bg-red-600 hover:bg-red-700 text-white py-2 rounded">
+            Logout
+        </button>
+    </aside>
+
+    <!-- ✅ Main Content -->
+    <main class="flex-1 p-10 overflow-y-auto">
+        <h1 class="text-3xl font-semibold mb-6">Welcome back 👋</h1>
+
+        <!-- Add Todo Form -->
+        <div class="card rounded-xl p-6 shadow-lg mb-8">
+            <h2 class="text-xl font-semibold mb-4">Add a New Todo</h2>
+            <form id="todoForm" class="space-y-4">
+                <div>
+                    <input type="text" id="title" placeholder="Todo Title"
+                        class="w-full p-3 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required />
+                </div>
+                <div>
+                    <textarea id="description" placeholder="Todo Description"
+                        class="w-full p-3 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required></textarea>
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium">
+                    ➕ Add Todo
+                </button>
+            </form>
+        </div>
+
+        <!-- Todo List -->
+        <div id="todoList" class="space-y-4">
+            <!-- Todos will appear here -->
+        </div>
+    </main>
+
+    <script>
+        // ✅ Token check
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login first!');
+            window.location.href = '/login';
+        }
+
+        // ✅ Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        });
+
+        // ✅ Add Todo
+        const form = document.getElementById('todoForm');
+        const todoList = document.getElementById('todoList');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+
+            if (!title || !description) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            // Call backend to save todo
+            const res = await fetch('/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ title, description })
+            });
+
+            const data = await res.json();
+
+            if (data.status) {
+                addTodoToList(title, description);
+                form.reset();
+            } else {
+                alert(data.error || 'Error adding todo');
+            }
+        });
+
+        function addTodoToList(title, description) {
+            const div = document.createElement('div');
+            div.className = 'card p-4 rounded-lg shadow flex flex-col';
+            div.innerHTML = `
+        <h3 class="text-lg font-semibold mb-2">${title}</h3>
+        <p class="text-gray-400">${description}</p>
+      `;
+            todoList.prepend(div);
+        }
+
+        // ✅ (Optional) Fetch existing todos on load
+        async function loadTodos() {
+            const res = await fetch('/todos', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const data = await res.json();
+            if (data.status) {
+                data.todos.forEach(t => addTodoToList(t.title, t.description));
+            }
+        }
+        loadTodos();
+    </script>
+</body>
+
+</html>

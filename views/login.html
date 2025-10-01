@@ -8,7 +8,7 @@
     <style>
         body {
             background: linear-gradient(to right, #2575fc, #6a11cb);
-            font-family: 'Segoe UI', sans-serif;
+            font-family: "Segoe UI", sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -72,32 +72,34 @@
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        document
+            .getElementById("loginForm")
+            .addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
 
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                const response = await fetch("/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const result = await response.json();
+                const messageEl = document.getElementById("message");
+
+                if (result.status) {
+                    messageEl.style.color = "green";
+                    messageEl.textContent = "Login successful! Redirecting...";
+                    localStorage.setItem("token", result.token); // ✅ Save token
+                    setTimeout(() => {
+                        window.location.href = "/dashboard"; // ✅ Redirect
+                    }, 1500);
+                } else {
+                    messageEl.style.color = "red";
+                    messageEl.textContent = result.error || "Invalid credentials!";
+                }
             });
-
-            const result = await response.json();
-            const messageEl = document.getElementById('message');
-
-            if (result.status) {
-                messageEl.style.color = 'green';
-                messageEl.textContent = 'Login successful!';
-                // redirect to dashboard or home
-                setTimeout(() => {
-                    window.location.href = '/dashboard';
-                }, 2000);
-            } else {
-                messageEl.style.color = 'red';
-                messageEl.textContent = result.error || 'Invalid credentials!';
-            }
-        });
     </script>
 </body>
 

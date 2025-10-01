@@ -51,7 +51,7 @@ exports.login = async (req, res, next) => {
         );
 
 
-        response.status(200).json({status:true, token: token});
+        res.status(200).json({status:true, token: token});
         
 
     } catch (err) {
