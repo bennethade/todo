@@ -11,14 +11,23 @@ class TodoServices{
     }
 
 
-    static async getTodoData({userId}){
+    static async getTodoData(userId){
         try {
-            const todoData = await TodoModel.find({userId});
+            const todoData = await TodoModel.find(userId);
             return todoData;
         } catch (error) {
             throw error;
         }
     }
+
+
+    static async deleteTodo(id){
+    
+        const deleted = await TodoModel.findOneAndDelete({_id: id});
+        return deleted;
+    
+    }
+
 }
 
 

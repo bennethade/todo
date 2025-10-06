@@ -9,7 +9,10 @@ const TodoController = require('../controller/todo.controller');
 
 router.post('/store-todo', TodoController.createTodo);
 
-router.get('/getUsertodoList', TodoController.getUserTodo);
+router.get('/getUserTodoList', TodoController.getUserTodo);
+
+
+router.get('/deleteTodo', TodoController.deleteTodo);
 
 
 
